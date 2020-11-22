@@ -10,7 +10,7 @@ RSpec.describe Eva do
       let(:expr) { nil }
 
       it 'raises error' do
-        expect { eva_machine.eval(expr) }.to raise_error('Not implemented')
+        expect { eva_machine.eval(expr) }.to raise_error(NotImplementedError)
       end
     end
 
@@ -72,6 +72,63 @@ RSpec.describe Eva do
       context 'when multiple operations' do
         let(:expr) { ['+', ['-', 5, 3], ['*', 2, 4]] }
         let(:result) { 10 }
+
+        it do
+          expect(eva_machine.eval(expr)).to eq(result)
+        end
+      end
+    end
+
+    context 'when variable declaration' do
+      let(:expr) { ['var', variable_name, variable_value] }
+      let(:variable_name) { 'x' }
+      let(:variable_value) { 1 }
+
+      context 'when declares variable' do
+        it do
+          expect(eva_machine.eval(expr)).to eq(variable_value)
+        end
+      end
+
+      context 'when gets variable value' do
+        before { eva_machine.eval(expr) }
+
+        it do
+          expect(eva_machine.eval(variable_name)).to eq(variable_value)
+        end
+      end
+
+      context 'when predefined variables' do
+        subject(:eva_machine) { Eva.new(environment) }
+
+        let(:environment) do
+          Environment.new(
+            'null' => nil,
+            'true' => true,
+            'false' => false,
+            'VERSION' => '0.1'
+          )
+        end
+        let(:expr) { 'VERSION' }
+        let(:result) { '0.1' }
+
+        it do
+          expect(eva_machine.eval(expr)).to eq(result)
+        end
+
+        context 'when value is predefined value' do
+          let(:expr) { %w[var isUser true] }
+          let(:result) { true }
+
+          it do
+            expect(eva_machine.eval(expr)).to eq(result)
+          end
+        end
+      end
+
+      context 'when value is calculated expression' do
+        let(:expr) { ['var', 'y', ['*', 2, 3]] }
+        let(:result) { 6 }
 
         it do
           expect(eva_machine.eval(expr)).to eq(result)
