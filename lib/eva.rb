@@ -21,6 +21,13 @@ class Eva
     return self.eval(expr[1], env) + self.eval(expr[2], env) if expr&.[](0) == '+'
     return self.eval(expr[1], env) - self.eval(expr[2], env) if expr&.[](0) == '-'
 
+    # Comparison operators:
+    return self.eval(expr[1], env) > self.eval(expr[2], env) if expr&.[](0) == '>'
+    return self.eval(expr[1], env) >= self.eval(expr[2], env) if expr&.[](0) == '>='
+    return self.eval(expr[1], env) < self.eval(expr[2], env) if expr&.[](0) == '<'
+    return self.eval(expr[1], env) <= self.eval(expr[2], env) if expr&.[](0) == '<='
+    return self.eval(expr[1], env) == self.eval(expr[2], env) if expr&.[](0) == '='
+
     # Block: sequence of expressions
     if expr&.[](0) == 'begin'
       block_env = Environment.new({}, env)
@@ -41,6 +48,15 @@ class Eva
 
     # Variable access:
     return env.lookup(expr) if variable?(expr)
+
+    # if-expression:
+    if expr&.[](0) == 'if'
+      _tag, condition, consequent, alternate = expr
+
+      return self.eval(consequent, env) if self.eval(condition, env)
+
+      return self.eval(alternate, env)
+    end
 
     raise NotImplementedError, expr
   end

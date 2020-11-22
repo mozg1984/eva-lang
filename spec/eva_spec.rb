@@ -203,5 +203,24 @@ RSpec.describe Eva do
         expect(eva_machine.eval(expr)).to eq(result)
       end
     end
+
+    context 'when condition expression' do
+      let(:expr) do
+        ['begin',
+          ['var', 'x', 10],
+          ['var', 'y', 0],
+          ['if', ['>', 'x', 10],
+            ['set', 'y', 20],
+            ['set', 'y', 30]
+          ],
+          'y'
+        ]
+      end
+      let(:result) { 30 }
+
+      it do
+        expect(eva_machine.eval(expr)).to eq(result)
+      end
+    end
   end
 end
