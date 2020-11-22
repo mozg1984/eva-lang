@@ -58,6 +58,16 @@ class Eva
       return self.eval(alternate, env)
     end
 
+    # while-expression:
+    if expr&.[](0) == 'while'
+      result = nil
+
+      _tag, condition, body = expr
+      while self.eval(condition, env) do result = self.eval(body, env) end
+
+      return result
+    end
+
     raise NotImplementedError, expr
   end
 

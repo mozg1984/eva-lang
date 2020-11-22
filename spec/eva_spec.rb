@@ -222,5 +222,31 @@ RSpec.describe Eva do
         expect(eva_machine.eval(expr)).to eq(result)
       end
     end
+
+    context 'when while loop expression' do
+      let(:expr) do
+        ['begin',
+
+          ['var', 'counter', 0],
+          ['var', 'result', 0],
+
+          ['while', ['<', 'counter', 10],
+            # result++
+            # TODO: implement ['++', <Expr>]
+            ['begin',
+              ['set', 'result', ['+', 'result', 1]],
+              ['set', 'counter', ['+', 'counter', 1]]
+            ],
+          ],
+
+          'result'
+        ]
+      end
+      let(:result) { 10 }
+
+      it do
+        expect(eva_machine.eval(expr)).to eq(result)
+      end
+    end
   end
 end
