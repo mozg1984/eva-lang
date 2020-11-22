@@ -135,5 +135,73 @@ RSpec.describe Eva do
         end
       end
     end
+
+    context 'when block expression' do
+      let(:expr) do
+        ['begin',
+          ['var', 'x', 10],
+          ['var', 'y', 20],
+          ['+', ['*', 'x', 'y'], 30]
+        ]
+      end
+      let(:result) { 230 }
+
+      it do
+        expect(eva_machine.eval(expr)).to eq(result)
+      end
+    end
+
+    context 'when block with nested block expression' do
+      let(:expr) do
+        ['begin',
+          ['var', 'x', 10],
+          ['begin',
+            ['var', 'x', 20],
+            'x'
+          ],
+          'x'
+        ]
+      end
+      let(:result) { 10 }
+
+      it do
+        expect(eva_machine.eval(expr)).to eq(result)
+      end
+    end
+
+    context 'when variable in nested block accesses varible in outer block expression' do
+      let(:expr) do
+        ['begin',
+          ['var', 'value', 10],
+          ['var', 'result', ['begin',
+            ['var', 'x', ['+', 'value', 10]],
+            'x'
+          ]],
+          'result'
+        ]
+      end
+      let(:result) { 20 }
+
+      it do
+        expect(eva_machine.eval(expr)).to eq(result)
+      end
+    end
+
+    context 'when assigns variable in nested block expression' do
+      let(:expr) do
+        ['begin',
+          ['var', 'data', 10],
+          ['begin',
+            ['set', 'data', 100]
+          ],
+          'data'
+        ]
+      end
+      let(:result) { 100 }
+
+      it do
+        expect(eva_machine.eval(expr)).to eq(result)
+      end
+    end
   end
 end

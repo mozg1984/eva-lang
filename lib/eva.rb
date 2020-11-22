@@ -16,21 +16,42 @@ class Eva
     return expr[1..-2] if string?(expr)
 
     # Math operations:
-    return self.eval(expr[1]) * self.eval(expr[2]) if expr&.[](0) == '*'
-    return self.eval(expr[1]) / self.eval(expr[2]) if expr&.[](0) == '/'
-    return self.eval(expr[1]) + self.eval(expr[2]) if expr&.[](0) == '+'
-    return self.eval(expr[1]) - self.eval(expr[2]) if expr&.[](0) == '-'
+    return self.eval(expr[1], env) * self.eval(expr[2], env) if expr&.[](0) == '*'
+    return self.eval(expr[1], env) / self.eval(expr[2], env) if expr&.[](0) == '/'
+    return self.eval(expr[1], env) + self.eval(expr[2], env) if expr&.[](0) == '+'
+    return self.eval(expr[1], env) - self.eval(expr[2], env) if expr&.[](0) == '-'
+
+    # Block: sequence of expressions
+    if expr&.[](0) == 'begin'
+      block_env = Environment.new({}, env)
+      return _eval_block(expr, block_env)
+    end
 
     # Variable declaration:
     if expr&.[](0) == 'var'
       _, name, value = expr
-      return env.define(name, self.eval(value))
+      return env.define(name, self.eval(value, env))
+    end
+
+    # Variable updation:
+    if expr&.[](0) == 'set'
+      _, name, value = expr
+      return env.assign(name, self.eval(value, env))
     end
 
     # Variable access:
     return env.lookup(expr) if variable?(expr)
 
     raise NotImplementedError, expr
+  end
+
+  def _eval_block(block, env)
+    result = nil
+
+    _tag, *expressions = block
+    expressions.each { |expr| result = self.eval(expr, env) }
+
+    result
   end
 
   def number?(expr)
