@@ -89,6 +89,6 @@ class Eva
   end
 
   def variable?(expr)
-    expr.is_a?(String) && (/^[a-zA-Z][a-zA-Z0-9_]*$/ =~ expr).zero?
+    expr.is_a?(String) && (/^[a-zA-Z][a-zA-Z0-9_]*$/ =~ expr)&.zero?
   end
 end
