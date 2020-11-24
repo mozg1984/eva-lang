@@ -1,0 +1,60 @@
+/**
+ * S-expression parser.
+ * Atom: 42, foo, bar, "Hello World"
+ *
+ * List: (), (+ 5 x), (print "hello")
+ */
+
+// ----------------------------------------------------
+// Lexical grammar (tokens):
+
+%lex
+
+%%
+
+\s+               # skip whitespace
+
+\"[^\"]*\"        return 'STRING'
+
+\d+               return 'NUMBER'
+
+[\w\-+*=<>\/]+    return 'SYMBOL'
+
+/lex
+
+// -----------------------------------------------------------------------------
+// Module include
+
+%{
+
+def string_to_number(string)
+  return string.to_f if string.include?('.') || string.include?(',')
+  string.to_i
+end
+
+%}
+
+// ----------------------------------------------------
+// Syntactic grammar (BNF):
+
+%%
+
+Exp
+  : Atom
+  | List
+  ;
+
+Atom
+  : NUMBER { $$ = string_to_number($1) }
+  | STRING
+  | SYMBOL
+  ;
+
+List
+  : '(' ListEntries ')' { $$ = $2 }
+  ;
+
+ListEntries
+  : ListEntries Exp { $1.push($2); $$ = $1 }
+  | /* empty */     { $$ = [] }
+  ;
