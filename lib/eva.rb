@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
-require 'Environment'
+require 'environment/Global'
 
 # Eva interpreter.
 class Eva
   # Creates an Eva instance with the global environment.
-  def initialize(global = Environment.new)
+  def initialize(global = Environment::Global.build)
     @global = global
   end
 
@@ -14,19 +14,6 @@ class Eva
     # Self-evaluating expressions:
     return expr if number?(expr)
     return expr[1..-2] if string?(expr)
-
-    # Math operations:
-    return self.eval(expr[1], env) * self.eval(expr[2], env) if expr&.[](0) == '*'
-    return self.eval(expr[1], env) / self.eval(expr[2], env) if expr&.[](0) == '/'
-    return self.eval(expr[1], env) + self.eval(expr[2], env) if expr&.[](0) == '+'
-    return self.eval(expr[1], env) - self.eval(expr[2], env) if expr&.[](0) == '-'
-
-    # Comparison operators:
-    return self.eval(expr[1], env) > self.eval(expr[2], env) if expr&.[](0) == '>'
-    return self.eval(expr[1], env) >= self.eval(expr[2], env) if expr&.[](0) == '>='
-    return self.eval(expr[1], env) < self.eval(expr[2], env) if expr&.[](0) == '<'
-    return self.eval(expr[1], env) <= self.eval(expr[2], env) if expr&.[](0) == '<='
-    return self.eval(expr[1], env) == self.eval(expr[2], env) if expr&.[](0) == '='
 
     # Block: sequence of expressions
     if expr&.[](0) == 'begin'
@@ -68,6 +55,16 @@ class Eva
       return result
     end
 
+    # Function calls:
+    if expr.is_a?(Array)
+      fn = self.eval(expr[0])
+      args = expr[1..-1].map { |arg| self.eval(arg, env) }
+
+      # 1. Native function:
+
+      return fn.call(*args) if fn.is_a?(Proc)
+    end
+
     raise NotImplementedError, expr
   end
 
@@ -89,6 +86,6 @@ class Eva
   end
 
   def variable?(expr)
-    expr.is_a?(String) && (/^[a-zA-Z][a-zA-Z0-9_]*$/ =~ expr)&.zero?
+    expr.is_a?(String) && (/^[+\-*\/<>=a-zA-Z0-9_]*$/ =~ expr)&.zero?
   end
 end
