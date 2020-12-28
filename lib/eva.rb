@@ -55,17 +55,48 @@ class Eva
       return result
     end
 
+    # Function declaration:
+    if expr&.[](0) == 'def'
+      _tag, name, params, body = expr
+
+      fn = {
+        params: params,
+        body: body,
+        env: env # Closure!
+      }
+
+      return env.define(name, fn)
+    end
+
     # Function calls:
     if expr.is_a?(Array)
-      fn = self.eval(expr[0])
+      fn = self.eval(expr[0], env)
       args = expr[1..-1].map { |arg| self.eval(arg, env) }
 
       # 1. Native function:
-
       return fn.call(*args) if fn.is_a?(Proc)
+
+      # 2. User-defined function:
+      activation_record = {}
+      fn[:params].each_with_index do |param, index|
+        activation_record[param] = args[index]
+      end
+
+      activation_env = Environment.new(
+        activation_record,
+        fn[:env]
+      )
+
+      return _eval_body(fn[:body], activation_env)
     end
 
     raise NotImplementedError, expr
+  end
+
+  def _eval_body(body, env)
+    return _eval_block(body, env) if body&.[](0) == 'begin'
+
+    self.eval(body, env)
   end
 
   def _eval_block(block, env)
