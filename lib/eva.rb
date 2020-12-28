@@ -62,8 +62,14 @@ class Eva
     if expr&.[](0) == 'def'
       # JIT-transpile to a variable declaration
       var_exp = @transformer.transform_def_to_variable(expr)
-
       return self.eval(var_exp, env)
+    end
+
+    # Switch-expression:
+    # Syntactic sugar for nested if-expressions
+    if expr&.[](0) == 'switch'
+      if_exp = @transformer.transform_switch_to_if(expr)
+      return self.eval(if_exp, env)
     end
 
     # Lambda function calls:
