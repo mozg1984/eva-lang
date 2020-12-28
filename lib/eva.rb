@@ -68,6 +68,17 @@ class Eva
       return env.define(name, fn)
     end
 
+    # Lambda function calls:
+    if expr&.[](0) == 'lambda'
+      _tag, params, body = expr
+
+      return {
+        params: params,
+        body: body,
+        env: env # Closure!
+      }
+    end
+
     # Function calls:
     if expr.is_a?(Array)
       fn = self.eval(expr[0], env)
