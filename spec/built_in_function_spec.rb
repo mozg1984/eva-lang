@@ -17,7 +17,7 @@ RSpec.describe Eva do
     context 'when condition operations' do
       it { expect('(> 1 2)').to be_evaluated_to(false) }
       it { expect('(>= 2 1)').to be_evaluated_to(true) }
-      it { expect('(== 2 2)').to be_evaluated_to(true) }
+      it { expect('(= 2 2)').to be_evaluated_to(true) }
       it { expect('(< 6 3)').to be_evaluated_to(false) }
       it { expect('(<= 3 6)').to be_evaluated_to(true) }
     end
