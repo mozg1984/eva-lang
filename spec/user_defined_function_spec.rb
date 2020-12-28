@@ -68,5 +68,23 @@ RSpec.describe Eva do
 
       it { expect(expr).to be_evaluated_to(result) }
     end
+
+    context 'when recursive function' do
+      let(:expr) do
+        '(begin
+
+          (def factorial (x)
+            (if (= x 1)
+              1
+              (* x (factorial (- x 1)))))
+
+          (factorial 5)
+
+        )'
+      end
+      let(:result) { 120 }
+
+      it { expect(expr).to be_evaluated_to(result) }
+    end
   end
 end
