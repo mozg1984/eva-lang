@@ -72,6 +72,13 @@ class Eva
       return self.eval(if_exp, env)
     end
 
+    # For-loop: (for init condition modifier body)
+    # Syntactic sugar for: (begin init (while condition (begin body modifier)))
+    if expr&.[](0) == 'for'
+      while_exp = @transformer.transform_for_to_while(expr)
+      return self.eval(while_exp, env)
+    end
+
     # Increment:
     # Syntactic sugar for variable updation
     if expr&.[](0) == '++'

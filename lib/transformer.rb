@@ -9,6 +9,7 @@ class Transformer
     ['var', name, ['lambda', params, body]]
   end
 
+  # Transforms `switch` to nested `if`-expressions
   def transform_switch_to_if(switch_expr)
     _tag, *cases = switch_expr
 
@@ -31,21 +32,31 @@ class Transformer
     if_expr
   end
 
+  # Transforms `for` to `while`-expression
+  def transform_for_to_while(for_expr)
+    _tag, init, condition, modifier, body = for_expr
+    ['begin', init, ['while', condition, ['begin', body, modifier]]]
+  end
+
+  # Transforms `(++ <variable>)` to `(set <variable> (+ <variable> 1))`
   def transform_inc_to_set(inc_expr)
     _tag, expr = inc_expr
     ['set', expr, ['+', expr, 1]]
   end
 
+  # Transforms `(-- <variable>)` to `(set <variable> (- <variable> 1))`
   def transform_dec_to_set(dec_expr)
     _tag, expr = dec_expr
     ['set', expr, ['-', expr, 1]]
   end
 
+  # Transforms `(+= <variable> <value>)` to `(set <variable> (+ <variable> <value>))`
   def transform_inc_val_to_set(inc_expr)
     _tag, expr, val = inc_expr
     ['set', expr, ['+', expr, val]]
   end
 
+  # Transforms `(-= <variable> <value>)` to `(set <variable> (- <variable> <value>))`
   def transform_dec_val_to_set(dec_expr)
     _tag, expr, val = dec_expr
     ['set', expr, ['-', expr, val]]
