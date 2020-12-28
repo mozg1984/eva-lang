@@ -56,16 +56,14 @@ class Eva
     end
 
     # Function declaration:
+    # Syntactic sugar for assigning lambda to variable:
     if expr&.[](0) == 'def'
       _tag, name, params, body = expr
 
-      fn = {
-        params: params,
-        body: body,
-        env: env # Closure!
-      }
+      # JIT-transpile to a variable declaration
+      var_exp = ['var', name, ['lambda', params, body]]
 
-      return env.define(name, fn)
+      return self.eval(var_exp, env)
     end
 
     # Lambda function calls:
