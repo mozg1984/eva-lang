@@ -1,12 +1,14 @@
 # frozen_string_literal: true
 
 require 'environment/Global'
+require 'Transformer'
 
 # Eva interpreter.
 class Eva
   # Creates an Eva instance with the global environment.
   def initialize(global = Environment::Global.build)
     @global = global
+    @transformer = Transformer.new
   end
 
   # Evaluates an expression in the given environment.
@@ -58,10 +60,8 @@ class Eva
     # Function declaration:
     # Syntactic sugar for assigning lambda to variable:
     if expr&.[](0) == 'def'
-      _tag, name, params, body = expr
-
       # JIT-transpile to a variable declaration
-      var_exp = ['var', name, ['lambda', params, body]]
+      var_exp = @transformer.transform_def_to_variable(expr)
 
       return self.eval(var_exp, env)
     end
