@@ -30,4 +30,24 @@ class Transformer
 
     if_expr
   end
+
+  def transform_inc_to_set(inc_expr)
+    _tag, expr = inc_expr
+    ['set', expr, ['+', expr, 1]]
+  end
+
+  def transform_dec_to_set(dec_expr)
+    _tag, expr = dec_expr
+    ['set', expr, ['-', expr, 1]]
+  end
+
+  def transform_inc_val_to_set(inc_expr)
+    _tag, expr, val = inc_expr
+    ['set', expr, ['+', expr, val]]
+  end
+
+  def transform_dec_val_to_set(dec_expr)
+    _tag, expr, val = dec_expr
+    ['set', expr, ['-', expr, val]]
+  end
 end

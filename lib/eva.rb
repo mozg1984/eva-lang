@@ -72,6 +72,34 @@ class Eva
       return self.eval(if_exp, env)
     end
 
+    # Increment:
+    # Syntactic sugar for variable updation
+    if expr&.[](0) == '++'
+      set_exp = @transformer.transform_inc_to_set(expr)
+      return self.eval(set_exp, env)
+    end
+
+    # Decrement:
+    # Syntactic sugar for variable updation
+    if expr&.[](0) == '--'
+      set_exp = @transformer.transform_dec_to_set(expr)
+      return self.eval(set_exp, env)
+    end
+
+    # Increment by value:
+    # Syntactic sugar for variable updation
+    if expr&.[](0) == '+='
+      set_exp = @transformer.transform_inc_val_to_set(expr)
+      return self.eval(set_exp, env)
+    end
+
+    # Decrement by value:
+    # Syntactic sugar for variable updation
+    if expr&.[](0) == '-='
+      set_exp = @transformer.transform_dec_val_to_set(expr)
+      return self.eval(set_exp, env)
+    end
+
     # Lambda function calls:
     if expr&.[](0) == 'lambda'
       _tag, params, body = expr
