@@ -8,9 +8,7 @@ RSpec.describe Eva do
 
   describe '#eval class expression' do
     let(:expr) do
-      '(begin
-
-        (class Point null
+      '(class Point null
           (begin
 
             (def constructor (this x y)
@@ -23,9 +21,7 @@ RSpec.describe Eva do
 
         (var p (new Point 10 20))
 
-        ((prop p calc) p)
-
-      )'
+        ((prop p calc) p)'
     end
     let(:result) { 30 }
 

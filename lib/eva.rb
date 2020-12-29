@@ -11,6 +11,11 @@ class Eva
     @transformer = Transformer.new
   end
 
+  # Evaluates global code wrapping into a block
+  def eval_global(expressions)
+    _eval_block(['block', expressions], @global)
+  end
+
   # Evaluates an expression in the given environment.
   def eval(expr, env = @global)
     # Self-evaluating expressions:
