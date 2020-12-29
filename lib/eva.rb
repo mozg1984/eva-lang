@@ -31,8 +31,20 @@ class Eva
 
     # Variable updation:
     if expr&.[](0) == 'set'
-      _, name, value = expr
-      return env.assign(name, self.eval(value, env))
+      _, ref, value = expr
+
+      # Assignment to a property
+      if ref&.[](0) == 'prop'
+        _tag, instance, prop_name = ref
+        instance_env = self.eval(instance, env)
+        return instance_env.define(
+          prop_name,
+          self.eval(value, env)
+        )
+      end
+
+      # Simple assignment
+      return env.assign(ref, self.eval(value, env))
     end
 
     # Variable access:
@@ -118,29 +130,77 @@ class Eva
       }
     end
 
-    # Function calls:
+    # Class declaration: (class <Name> <Parent> <Body>)
+    if expr&.[](0) == 'class'
+      _tag, name, parent, body = expr
+
+      # A class is an environment! -- a storage of methods and shared properties:
+      parent_env = self.eval(parent, env) || env
+
+      class_env = Environment.new({}, parent_env)
+
+      # Body is evaluated in the class environment
+      _eval_body(body, class_env)
+
+      # Class is accessible by name
+      return env.define(name, class_env)
+    end
+
+    # Class instantiation: (new <Class> <Arguments>...)
+    if expr&.[](0) == 'new'
+      class_env = self.eval(expr[1], env)
+
+      # An instance of a class is an environment!
+      # The `parent` component of the instance environment
+      # is set to its class
+
+      instance_env = Environment.new({}, class_env)
+
+      args = expr[2..-1].map { |arg| self.eval(arg, env) }
+
+      _call_user_defined_function(
+        class_env.lookup('constructor'),
+        [instance_env, *args]
+      )
+
+      return instance_env
+    end
+
+    # Property access: (prop <instance> <name>)
+    if expr&.[](0) == 'prop'
+      _tag, instance, name = expr
+      instance_env = self.eval(instance, env)
+      return instance_env.lookup(name)
+    end
+
+    # Function calls
     if expr.is_a?(Array)
       fn = self.eval(expr[0], env)
       args = expr[1..-1].map { |arg| self.eval(arg, env) }
 
-      # 1. Native function:
+      # 1. Native function
       return fn.call(*args) if fn.is_a?(Proc)
 
-      # 2. User-defined function:
-      activation_record = {}
-      fn[:params].each_with_index do |param, index|
-        activation_record[param] = args[index]
-      end
-
-      activation_env = Environment.new(
-        activation_record,
-        fn[:env]
-      )
-
-      return _eval_body(fn[:body], activation_env)
+      # 2. User-defined function
+      return _call_user_defined_function(fn, args)
     end
 
     raise NotImplementedError, expr
+  end
+
+  def _call_user_defined_function(func, args)
+    activation_record = {}
+
+    func[:params].each_with_index do |param, index|
+      activation_record[param] = args[index]
+    end
+
+    activation_env = Environment.new(
+      activation_record,
+      func[:env]
+    )
+
+    _eval_body(func[:body], activation_env)
   end
 
   def _eval_body(body, env)
