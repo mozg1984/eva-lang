@@ -1,0 +1,8 @@
+(def abs (value)
+  (if (< value 0)
+      (- value)
+      value))
+
+(def square (x) (* x x))
+
+(var MAX_VALUE 4611686018427387903)

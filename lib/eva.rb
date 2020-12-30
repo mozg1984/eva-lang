@@ -2,6 +2,7 @@
 
 require 'environment/Global'
 require 'Transformer'
+require 'parser/EvaParser'
 
 # Eva interpreter.
 class Eva
@@ -12,8 +13,8 @@ class Eva
   end
 
   # Evaluates global code wrapping into a block
-  def eval_global(expressions)
-    _eval_block(['block', expressions], @global)
+  def eval_global(expr)
+    _eval_body(expr, @global)
   end
 
   # Evaluates an expression in the given environment.
@@ -182,6 +183,27 @@ class Eva
       _tag, instance, name = expr
       instance_env = self.eval(instance, env)
       return instance_env.lookup(name)
+    end
+
+    # Module declaration: (module <name> <body>)
+    if expr&.[](0) == 'module'
+      _tag, name, body = expr
+      module_env = Environment.new({}, env)
+      _eval_body(body, module_env)
+
+      return env.define(name, module_env)
+    end
+
+    # Module import: (import <name>)
+    if expr&.[](0) == 'import'
+      _tag, name = expr
+
+      # TODO: caching of modules
+      module_src = File.open("#{__dir__}/modules/#{name}.eva", 'r:UTF-8', &:read)
+      body = EvaParser.parse("(begin #{module_src})")
+      module_expr = ['module', name, body]
+
+      return self.eval(module_expr, @global)
     end
 
     # Function calls
