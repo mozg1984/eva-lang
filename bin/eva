@@ -1,0 +1,30 @@
+#!/usr/bin/env ruby
+
+lib_directory = "#{__dir__}/../lib"
+
+require "#{lib_directory}/parser/EvaParser"
+require "#{lib_directory}/Eva"
+
+def eval_global(src, eva)
+  expr = EvaParser.parse("(begin #{src})")
+  Eva.new.eval_global(expr)
+end
+
+def main(argv)
+  mode, expr = argv
+
+  eva_machine = Eva.new
+
+  # Direct expression:
+  if mode == '-e'
+    return eval_global(expr, eva_machine)
+  end
+
+  # Eva file:
+  if mode == '-f'
+    src = File.open(expr, 'r:UTF-8', &:read)
+    return eval_global(src, eva_machine)
+  end
+end
+
+main(ARGV)

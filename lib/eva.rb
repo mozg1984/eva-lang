@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-require 'environment/Global'
-require 'Transformer'
-require 'parser/EvaParser'
+require_relative 'environment/Global'
+require_relative 'Transformer'
+require_relative 'parser/EvaParser'
 
 # Eva interpreter.
 class Eva
