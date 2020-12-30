@@ -3,6 +3,7 @@
 # Environment: names storage.
 class Environment
   attr_reader :record
+  attr_reader :parent
 
   # Creates an environment with the given record.
   def initialize(record = {}, parent = nil)

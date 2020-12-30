@@ -151,6 +151,12 @@ class Eva
       return env.define(name, class_env)
     end
 
+    # Super expression: (super <ClassName>)
+    if expr&.[](0) == 'super'
+      _tag, class_name = expr
+      return self.eval(class_name, env).parent
+    end
+
     # Class instantiation: (new <Class> <Arguments>...)
     if expr&.[](0) == 'new'
       class_env = self.eval(expr[1], env)
