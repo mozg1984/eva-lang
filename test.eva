@@ -29,6 +29,17 @@
       (+ ((prop super calc) this)
           (prop this z)))))
 
-(var p (new Point3D 10 20 30))
+(class App null
+  (begin
+    (def constructor () null)
+    (def version () "0.0.1")))
 
-(print "Value:" ((prop p calc) p))
+(class ChildApp App
+  (begin
+    (def constructor () null)))
+
+(var p (new Point3D 10 20 30))
+(print "3D point calc value:" ((prop p calc) p))
+
+(var testApp (new ChildApp))
+(print "Test app version:" ((prop testApp version)))
