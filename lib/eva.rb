@@ -181,6 +181,13 @@ class Eva
     # Property access: (prop <instance> <name>)
     if expr&.[](0) == 'prop'
       _tag, instance, name = expr
+
+      # Lookups in parent class
+      if instance == 'super'
+        instance_env = self.eval('this', env).parent.parent
+        return instance_env.lookup(name)
+      end
+
       instance_env = self.eval(instance, env)
       return instance_env.lookup(name)
     end
