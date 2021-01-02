@@ -2,12 +2,12 @@
 
 lib_directory = "#{__dir__}/../lib"
 
-require "#{lib_directory}/parser/EvaParser"
-require "#{lib_directory}/Eva"
+require "#{lib_directory}/parser/EvaParser.rb"
+require "#{lib_directory}/eva.rb"
 
 def eval_global(src, eva)
   expr = EvaParser.parse("(begin #{src})")
-  Eva.new.eval_global(expr)
+  eva.eval_global(expr)
 end
 
 def main(argv)

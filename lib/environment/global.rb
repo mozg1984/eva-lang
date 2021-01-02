@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative '../Environment'
+require_relative '../environment.rb'
 
 class Environment
   class Global
