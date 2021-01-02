@@ -22,6 +22,14 @@ RSpec.describe Eva do
       it { expect('(<= 3 6)').to be_evaluated_to(true) }
     end
 
+    context 'when logical operations' do
+      it { expect('(or false true)').to be_evaluated_to(true) }
+      it { expect('(or false false)').to be_evaluated_to(false) }
+      it { expect('(and true false)').to be_evaluated_to(false) }
+      it { expect('(and true true)').to be_evaluated_to(true) }
+      it { expect('(not false)').to be_evaluated_to(true) }
+    end
+
     context 'when print function' do
       let(:expr) { ['print', '"Hello,"', '"world"'] }
       let(:result) { "Hello,\nworld\n" }

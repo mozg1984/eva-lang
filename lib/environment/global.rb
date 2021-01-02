@@ -26,6 +26,11 @@ class Environment
         '<' => ->(op1, op2) { op1 < op2 },
         '<=' => ->(op1, op2) { op1 <= op2 },
 
+        # Logical operators
+        'or' => ->(op1, op2) { op1 || op2 },
+        'and' => ->(op1, op2) { op1 && op2 },
+        'not' => ->(op) { !op },
+
         # Console output:
         'print' => ->(*args) { puts args }
       )
